@@ -26,13 +26,26 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-buildx-
 
+      - name: Install bump2version
+        run: pip install bump2version
+
+      - name: Bump version
+        id: bump_version
+        run: |
+          bump2version patch --allow-dirty
+          echo "VERSION=$(cat .version)" >> $GITHUB_ENV
+
+      - name: Get version
+        id: get_version
+        run: echo "VERSION=$(cat .version)" >> $GITHUB_ENV
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v3
         with:
           context: .
           file: ./Dockerfile
           push: false
-          tags: edalferes/gstd-runner:latest
+          tags: edalferes/gstd-runner:latest,edalferes/gstd-runner:${{ env.VERSION }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,mode=max,dest=/tmp/.buildx-cache
 
@@ -48,6 +61,12 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: edalferes/gstd-runner:latest
+          tags: edalferes/gstd-runner:latest,edalferes/gstd-runner:${{ env.VERSION }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,mode=max,dest=/tmp/.buildx-cache
+
+      - name: Commit bumped version
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Bump version to ${{ env.VERSION }}
+          file_pattern: .version
