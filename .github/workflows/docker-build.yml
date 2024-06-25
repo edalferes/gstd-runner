@@ -45,8 +45,13 @@ jobs:
 
       - name: Create Git tag
         run: |
-          git tag -a v${{ env.VERSION }} -m "Release version ${{ env.VERSION }}"
-          git push origin v${{ env.VERSION }}
+          TAG_EXISTS=$(git tag -l "v${{ env.VERSION }}")
+          if [ -z "$TAG_EXISTS" ]; then
+            git tag -a v${{ env.VERSION }} -m "Release version ${{ env.VERSION }}"
+            git push origin v${{ env.VERSION }}
+          else
+            echo "Tag v${{ env.VERSION }} already exists. Skipping tag creation."
+          fi
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v3
