@@ -37,6 +37,17 @@ jobs:
           bump2version patch --allow-dirty
           echo "VERSION=$(cat VERSION)" >> $GITHUB_ENV
 
+      - name: Install GitHub CLI
+        run: sudo apt-get install gh -y
+
+      - name: Authenticate with GitHub CLI
+        run: gh auth login --with-token ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Git tag
+        run: |
+          git tag -a v${{ env.VERSION }} -m "Release version ${{ env.VERSION }}"
+          git push origin v${{ env.VERSION }}
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v3
         with:
