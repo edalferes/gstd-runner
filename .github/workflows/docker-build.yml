@@ -32,6 +32,8 @@ jobs:
       - name: Bump version
         id: bump_version
         run: |
+          git config --global user.email "edmilson.alferes@alpheres.com"
+          git config --global user.name "Edmilson Alferes"
           bump2version patch --allow-dirty
           echo "VERSION=$(cat VERSION)" >> $GITHUB_ENV
 
