@@ -33,11 +33,7 @@ jobs:
         id: bump_version
         run: |
           bump2version patch --allow-dirty
-          echo "VERSION=$(cat .version)" >> $GITHUB_ENV
-
-      - name: Get version
-        id: get_version
-        run: echo "VERSION=$(cat .version)" >> $GITHUB_ENV
+          echo "VERSION=$(cat VERSION)" >> $GITHUB_ENV
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v3
@@ -69,4 +65,4 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: Bump version to ${{ env.VERSION }}
-          file_pattern: .version
+          file_pattern: VERSION
